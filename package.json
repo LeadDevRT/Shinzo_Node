@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Node server",
   "main": "index.js",
-"start": "index.js",  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1","start": "index.js"
   },
-  "author": "",
+  "author": "Thibault Durand pour RA",
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.3"
