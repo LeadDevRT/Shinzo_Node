@@ -3,10 +3,12 @@ var bodyParser = require('body-parser')
 const app = express()
 const dgram = require('dgram');
 const client = dgram.createSocket('udp4');
+const serverAddr = "shinzoapi.thibaultdurand.com";
+const serverPort = 41234;
 const secret = "tbDRldYRtJ";
 var isLive = true;
-app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/event_cell', function (req, res) {
  res.status(404);
@@ -35,15 +37,14 @@ app.get('/event_cell', function (req, res) {
 
   if (token == secret) {
 
-	if ((index != null) &&(action != null) ) {
-		console.log (index + token + action);
+	if (action != null) {
 		res.status(200);
 		res.send('Request sent');
 		var message = Buffer.from('{"index":"'+index+'", "action":"' + action + '"}');
 		console.log ('{"index":"'+index+'", "action":"' + action + '"}');
-		//client.send(message, 41234, '127.0.0.1', (err) => {
-			//console.log(err);
-		//});
+		client.send(message, serverPort, serverAddr, (err) => {
+			console.log(err);
+		});
 	} else {
 		res.status(400);
 		res.send('Bad request');
