@@ -5,11 +5,11 @@ const app = express()
 // const client = dgram.createSocket('udp4');
 const net = require('net');
 // const serverAddr = "shinzoapi.thibaultdurand.com";
-const serverAddr = "90.87.153.249";
+const serverAddr = "127.0.0.1";
 const serverPort = 41234;
 const secret = "tbDRldYRtJ";
 var isLive = true;
-var client = new net.Socket();
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -48,10 +48,11 @@ app.get('/event_cell', function (req, res) {
 		// client.send(message, serverPort, serverAddr, (err) => {
 		// 	console.log(err);
 		// });
-
+		var client = new net.Socket();
 		client.connect(serverPort, serverAddr, function() {
 			console.log('Connected');
 			client.write('{"index":"'+index+'", "action":"' + action + '"}');
+			client.destroy();
 		});
 	} else {
 		res.status(400);
