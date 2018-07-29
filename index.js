@@ -3,6 +3,7 @@ var bodyParser = require('body-parser')
 const app = express()
 const dgram = require('dgram');
 const client = dgram.createSocket('udp4');
+// const serverAddr = "shinzoapi.thibaultdurand.com";
 const serverAddr = "90.87.153.249";
 const serverPort = 41234;
 const secret = "tbDRldYRtJ";
