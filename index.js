@@ -1,13 +1,15 @@
 const express = require('express')
 var bodyParser = require('body-parser')
 const app = express()
-const dgram = require('dgram');
-const client = dgram.createSocket('udp4');
+// const dgram = require('dgram');
+// const client = dgram.createSocket('udp4');
+const net = require('net');
 // const serverAddr = "shinzoapi.thibaultdurand.com";
 const serverAddr = "90.87.153.249";
 const serverPort = 41234;
 const secret = "tbDRldYRtJ";
 var isLive = true;
+var client = new net.Socket();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -41,10 +43,15 @@ app.get('/event_cell', function (req, res) {
 	if (action != null) {
 		res.status(200);
 		res.send('Request sent');
-		var message = Buffer.from('{"index":"'+index+'", "action":"' + action + '"}');
-		console.log ('{"index":"'+index+'", "action":"' + action + '"}');
-		client.send(message, serverPort, serverAddr, (err) => {
-			console.log(err);
+		// var message = Buffer.from('{"index":"'+index+'", "action":"' + action + '"}');
+		// console.log ('{"index":"'+index+'", "action":"' + action + '"}');
+		// client.send(message, serverPort, serverAddr, (err) => {
+		// 	console.log(err);
+		// });
+
+		client.connect(serverPort, serverAddr, function() {
+			console.log('Connected');
+			client.write('{"index":"'+index+'", "action":"' + action + '"}');
 		});
 	} else {
 		res.status(400);
