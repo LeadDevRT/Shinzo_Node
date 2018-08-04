@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Creating WebSocket server
 const wss = new WebSocket.Server({
-  port: serverPort,
+  app
 });
 
 wss.on('connection', function connection(ws) {
