@@ -1,17 +1,19 @@
 const express = require('express')
 var bodyParser = require('body-parser')
-const app = express()
+const app = express();
 const WebSocket = require('ws');
 const serverPort = 41234;
 const secret = "tbDRldYRtJ";
 var isLive = true;
 // List of clients connected (= Unity Server)
 var clients = [];
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
+app.listen(process.env.PORT || 5000, function () {
+  console.log('App ready!')
+});
 
 // Creating WebSocket server
-const wss = new WebSocket.Server({ port: 41234 });
+const wss = new WebSocket.Server({ server: app });
 
 wss.on('connection', function connection(ws) {
 	clients.push (ws);
@@ -68,6 +70,3 @@ app.get('/event_cell', function (req, res) {
 
 })
 
-app.listen(process.env.PORT || 5000, function () {
-  console.log('App ready!')
-})
