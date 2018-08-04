@@ -1,7 +1,7 @@
 const express = require('express')
 var bodyParser = require('body-parser')
 const app = express()
-const net = require('net');
+const WebSocket = require('ws');
 const serverPort = 41234;
 const secret = "tbDRldYRtJ";
 var isLive = true;
@@ -10,27 +10,25 @@ var clients = [];
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-net.createServer(function (socket) {
-  // Identify this client
-  socket.name = socket.remoteAddress + ":" + socket.remotePort 
-  // Put this new client in the list
-  clients.push(socket);
+// Creating WebSocket server
+const wss = new WebSocket.Server({
+  port: serverPort,
+});
 
-  // Remove the client from the list when it leaves
-  socket.on('end', function () {
-    clients.splice(clients.indexOf(socket), 1);
-  });
+wss.on('connection', function connection(ws) {
+	clients.push (ws);
+	console.log ("Client connected");
+});
 
-}).listen(serverPort);
-
-  // Send a message to all clients
+// Send a message to all clients
 function broadcast(message) {
-    clients.forEach(function (client) {
+	console.log ("Client broadcasting");
 
-      client.write(message);
+	wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
     });
-    // Log it to the server output too
-    process.stdout.write(message)
 }
 
 // Endpoint to check if Buy & Collect is live
