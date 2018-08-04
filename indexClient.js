@@ -1,42 +1,27 @@
 const express = require('express')
 var bodyParser = require('body-parser')
 const app = express()
+// const dgram = require('dgram');
+// const client = dgram.createSocket('udp4');
 const net = require('net');
+// const serverAddr = "shinzoapi.thibaultdurand.com";
+const serverAddr = "shinzoapi.ddns.net";
 const serverPort = 41234;
 const secret = "tbDRldYRtJ";
 var isLive = true;
-// List of clients connected (= Unity Server)
-var clients = [];
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-net.createServer(function (socket) {
-  // Identify this client
-  socket.name = socket.remoteAddress + ":" + socket.remotePort 
-  // Put this new client in the list
-  clients.push(socket);
+app.post('/event_cell', function (req, res) {
+ res.status(404);
+ res.send('Please use get method');
+})
 
-  // Remove the client from the list when it leaves
-  socket.on('end', function () {
-    clients.splice(clients.indexOf(socket), 1);
-  });
 
-}).listen(serverPort);
-
-  // Send a message to all clients
-function broadcast(message) {
-    clients.forEach(function (client) {
-
-      client.write(message);
-    });
-    // Log it to the server output too
-    process.stdout.write(message)
-}
-
-// Endpoint to check if Buy & Collect is live
 app.get('/is_live', function (req, res) {
 
-  if (clients.length < 0) {
+  if (isLive) {
 		res.status(200);
 		res.send('System live');
   } else {
@@ -46,7 +31,7 @@ app.get('/is_live', function (req, res) {
 
 })
 
-// Endpoint to send event (open or update) to Unity Server
+
 app.get('/event_cell', function (req, res) {
 
   var index = req.param('index');
@@ -58,8 +43,17 @@ app.get('/event_cell', function (req, res) {
 	if (action != null) {
 		res.status(200);
 		res.send('Request sent');
-		broadcast ('{"index":"'+index+'", "action":"' + action + '"}')
-
+		// var message = Buffer.from('{"index":"'+index+'", "action":"' + action + '"}');
+		// console.log ('{"index":"'+index+'", "action":"' + action + '"}');
+		// client.send(message, serverPort, serverAddr, (err) => {
+		// 	console.log(err);
+		// });
+		var client = new net.Socket();
+		client.connect(serverPort, serverAddr, function() {
+			console.log('Connected');
+			client.write('{"index":"'+index+'", "action":"' + action + '"}');
+			client.destroy();
+		});
 	} else {
 		res.status(400);
 		res.send('Bad request');
