@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Creating WebSocket server
-const wss = new WebSocket.Server({ server: app });
+const wss = new WebSocket.Server({ port: 41234 });
 
 wss.on('connection', function connection(ws) {
 	clients.push (ws);
