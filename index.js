@@ -1,10 +1,7 @@
 const express = require('express')
-var bodyParser = require('body-parser')
-const app = express()
-// const dgram = require('dgram');
-// const client = dgram.createSocket('udp4');
+const bodyParser = require('body-parser')
+const app = express();
 const net = require('net');
-// const serverAddr = "shinzoapi.thibaultdurand.com";
 const serverAddr = "shinzoapi.ddns.net";
 const serverPort = 41234;
 const secret = "tbDRldYRtJ";
@@ -13,12 +10,8 @@ var isLive = true;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/event_cell', function (req, res) {
- res.status(404);
- res.send('Please use get method');
-})
 
-
+// TODO : add a way to check if Buy&Collect is live or not
 app.get('/is_live', function (req, res) {
 
   if (isLive) {
@@ -31,29 +24,29 @@ app.get('/is_live', function (req, res) {
 
 })
 
-
+// Endpoint to send event to Buy&Collect Unity Server
 app.get('/event_cell', function (req, res) {
 
+  // Getting params
   var index = req.param('index');
   var token = req.param('token');
   var action = req.param('action');  
 
+  // If secret is good then proceed.
   if (token == secret) {
 
 	if (action != null) {
 		res.status(200);
 		res.send('Request sent');
-		// var message = Buffer.from('{"index":"'+index+'", "action":"' + action + '"}');
-		// console.log ('{"index":"'+index+'", "action":"' + action + '"}');
-		// client.send(message, serverPort, serverAddr, (err) => {
-		// 	console.log(err);
-		// });
+		// Create TCP client and connect to Unity Server
 		var client = new net.Socket();
 		client.connect(serverPort, serverAddr, function() {
-			console.log('Connected');
 			client.write('{"index":"'+index+'", "action":"' + action + '"}');
 			client.destroy();
 		});
+		client.on('error', function(err){
+			console.log("Error: "+err.message);
+		})
 	} else {
 		res.status(400);
 		res.send('Bad request');
